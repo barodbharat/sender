@@ -9,7 +9,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 const client = new Client({
-    puppeteer: {headless:false, 
+    puppeteer: {headless:true, 
         args: [
             '--no-sandbox', 
             '--disable-setuid-sandbox',
@@ -134,7 +134,7 @@ app.get('/qrcode', (req, res) => {
     });
 });
 
-// client.initialize();
+client.initialize();
 // Start web server
 app.listen(port, () => {
     console.log(`API running at http://localhost:${port}`);
