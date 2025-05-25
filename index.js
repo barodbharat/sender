@@ -127,11 +127,12 @@ app.get('/qrcode', (req, res) => {
    
     //client.session = "00001";
 
-    client.on('qr', (qr) => {
+    //client.on('qr', (qr) => {
         //console.log('QR RECEIVED');
         //qrcode.generate(qr, { small: true });
-        res.json({ qrcode : qr});
-    });
+        //res.json({ qrcode : qr});
+    //});
+    res.json({ qrcode : qrstr});
 });
 
 client.initialize();
