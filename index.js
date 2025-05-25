@@ -115,8 +115,8 @@ app.get('/qrcode', (req, res) => {
     });
 });
 
-client.initialize();
+//client.initialize();
 // Start web server
-app.listen(port, () => {
-    console.log(`API running at http://localhost:${port}`);
-});
+//app.listen(port, () => {
+//    console.log(`API running at http://localhost:${port}`);
+//});
