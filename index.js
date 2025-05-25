@@ -49,14 +49,14 @@ app.get('/', (req, res) => {
     res.send('WhatsApp Web API is running!');
 });
 
+//Start Web.Whatsapp.Com
 app.get('/whatsapp', async (req, res) => {
     try {
         client.on('qr', (qr) => {
-            qrstr=qr;
             res.status(200).send({ qrCode: qr })
         })
         client.on('ready', async () => {
-            wstatus='ok'
+            reply='ok'
             res.status(200).json({ status: 'ok'});
         })
         await client.initialize()
@@ -134,7 +134,7 @@ app.get('/qrcode', (req, res) => {
     });
 });
 
-//client.initialize();
+// client.initialize();
 // Start web server
 app.listen(port, () => {
     console.log(`API running at http://localhost:${port}`);
