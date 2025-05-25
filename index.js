@@ -49,6 +49,25 @@ app.get('/', (req, res) => {
     res.send('WhatsApp Web API is running!');
 });
 
+app.get('/whatsapp', async (req, res) => {
+    try {
+        client.on('qr', (qr) => {
+            qrstr=qr;
+            res.status(200).send({ qrCode: qr })
+        })
+        client.on('ready', async () => {
+            wstatus='ok'
+            res.status(200).json({ status: 'ok'});
+        })
+        await client.initialize()
+        //res.status(200).send.json({message:'Ok'})
+        //res.status(404)
+    } catch (err) {
+        console.log(err);
+        res.status(404).send(err)
+    }
+})
+
 // Send a text message
 app.post('/send-message', async (req, res) => {
     const q = req.body;
