@@ -17,30 +17,35 @@ const client = new Client({
     authStrategy: new LocalAuth() //new LocalAuth({ clientId: "YourClientId1" }) //new LocalAuth()
 });
 
-var qrstr='';
-var wstatus=''
+var qrstr = '';
+var status = '';
 
 // Generate QR code in terminal
 client.on('qr', (qr) => {
-            qrstr=qr;        
-            console.log('Qr Event Reply WStatus = ' + wstatus + ' QrCode = '+qrstr)
-            //res.status(200).send({ qrCode: qr })
+        qrstr = qr;
+        status = '';        
+        //console.log('Qr Event Reply WStatus = ' + wstatus + ' QrCode = '+qrstr)
+        //res.status(200).send({ qrCode: qr })
     })
 
 client.on('ready', async () => {
-    wstatus ='ok'
-    console.log('Ready Event Reply WStatus = ' + wstatus + ' QrCode = '+qrstr)
+    status = 'ready'
+    qrstr = '';
+    console.log('Ready Event Reply WStatus = ' + status + ' QrCode = '+qrstr)
     //reply='ok'
     //res.status(200).json({ status: 'ok'});
 })
 
 client.on('authenticated', () => {
-  console.log("Client is authenticated!");
+    status = 'authenticated'
+    qrstr = '';
+    //console.log("Client is authenticated!");
 });
 
 client.on('disconnected', () => {
-    wstatus='';  
-    console.log('Client disconnected:');
+    status = 'disconnected'
+    qrstr = '';
+    //console.log('Client disconnected:');
       // Handle the disconnection (e.g., reinitialize the client, display a message)
 });
 
@@ -53,10 +58,13 @@ app.get('/', (req, res) => {
 app.get('/whatsapp', async (req, res) => {
     try {
         client.on('qr', (qr) => {
+            qrstr = qr;
+            status = ''
             res.status(200).send({ qrCode: qr })
         })
         client.on('ready', async () => {
-            reply='ok'
+            status = 'ready'
+            qrstr = '';
             res.status(200).json({ status: 'ok'});
         })
         await client.initialize()
@@ -70,6 +78,13 @@ app.get('/whatsapp', async (req, res) => {
 
 // Send a text message
 app.post('/send-message', async (req, res) => {
+    client.getState().then((data)=>{
+        //console.log(data)
+        if (data != 'CONNECTED') {
+            return res.json({status: false, message:'Whatsapp not CONNECTED'})
+        }
+    })
+
     const q = req.body;
     //const { number, message } = req.body;
 
@@ -89,6 +104,13 @@ app.post('/send-message', async (req, res) => {
 
 // Send a media file (base64 format)
 app.post('/send-media', async (req, res) => {
+    client.getState().then((data)=>{
+        //console.log(data)
+        if (data != 'CONNECTED') {
+            return res.json({status: false, message:'Whatsapp not CONNECTED'})
+        }
+    })
+    
     const q = req.body;
     if (!q.number || !q.data || !q.filename || !q.mimetype) {
         return res.status(400).json({ status: false, message: 'Missing media parameters' });
@@ -127,12 +149,14 @@ app.get('/qrcode', (req, res) => {
    
     //client.session = "00001";
 
-    //client.on('qr', (qr) => {
-        //console.log('QR RECEIVED');
-        //qrcode.generate(qr, { small: true });
-        //res.json({ qrcode : qr});
-    //});
-    res.json({ qrcode : qrstr});
+    // client.on('qr', (qr) => {
+    //     //console.log('QR RECEIVED');
+    //     //qrcode.generate(qr, { small: true });
+    //     qrcode = qr;
+    //     status = '';
+    //     res.json({ qrcode : qr});
+    // });
+    res.json({ status : status, qrcode : qrstr});
 });
 
 client.initialize();
