@@ -54,6 +54,13 @@ app.get('/', (req, res) => {
     res.send('WhatsApp Web API is running!');
 });
 
+// Reret variables
+app.get('/', (req, res) => {
+    status = ''
+    qrstr = '';
+    res.send('Variable was reset');
+});
+
 //Start Web.Whatsapp.Com
 app.get('/whatsapp', async (req, res) => {
     try {
