@@ -51,14 +51,9 @@ client.on('disconnected', () => {
 
 // Root check
 app.get('/', (req, res) => {
-    res.send('WhatsApp Web API is running!');
-});
-
-// Reret variables
-app.get('/', (req, res) => {
     status = ''
     qrstr = '';
-    res.send('Variable was reset');
+    res.send('WhatsApp Web API is running!');
 });
 
 //Start Web.Whatsapp.Com
