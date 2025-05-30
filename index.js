@@ -9,7 +9,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 const client = new Client({
-    puppeteer: {headless:true, 
+    puppeteer: {headless:false, 
         args: [
             '--no-sandbox', 
             '--disable-setuid-sandbox',
@@ -31,7 +31,7 @@ client.on('qr', (qr) => {
 client.on('ready', async () => {
     status = 'ready'
     qrstr = '';
-    console.log('Ready Event Reply WStatus = ' + status + ' QrCode = '+qrstr)
+    //console.log('Ready Event Reply WStatus = ' + status + ' QrCode = '+qrstr)
     //reply='ok'
     //res.status(200).json({ status: 'ok'});
 })
@@ -42,19 +42,32 @@ client.on('authenticated', () => {
     //console.log("Client is authenticated!");
 });
 
-client.on('disconnected', () => {
-    status = 'disconnected'
-    qrstr = '';
+client.on('disconnected', (reason) => {
+    //status = 'disconnected'
+    //qrstr = '';
     //console.log('Client disconnected:');
-      // Handle the disconnection (e.g., reinitialize the client, display a message)
+    // Handle the disconnection (e.g., reinitialize the client, display a message)
+    client.destroy();
+    client.initialize();
+});
+
+client.on('auth_failure', (msg) => {
+    //console.error('Authentication failed:', msg);
+    client.destroy();
+    client.initialize();
 });
 
 // Root check
 app.get('/', (req, res) => {
-    status = ''
-    qrstr = '';
     res.send('WhatsApp Web API is running!');
 });
+
+// Reret variables
+// app.get('/', (req, res) => {
+//     status = ''
+//     qrstr = '';
+//     res.send('Variable was reset');
+// });
 
 //Start Web.Whatsapp.Com
 app.get('/whatsapp', async (req, res) => {
@@ -83,6 +96,9 @@ app.post('/send-message', async (req, res) => {
     client.getState().then((data)=>{
         //console.log(data)
         if (data != 'CONNECTED') {
+            status = ''
+            qrstr = '';
+
             return res.json({status: false, message:'Whatsapp not CONNECTED'})
         }
     })
@@ -109,6 +125,9 @@ app.post('/send-media', async (req, res) => {
     client.getState().then((data)=>{
         //console.log(data)
         if (data != 'CONNECTED') {
+            status = ''
+            qrstr = '';
+
             return res.json({status: false, message:'Whatsapp not CONNECTED'})
         }
     })
@@ -161,8 +180,15 @@ app.get('/qrcode', (req, res) => {
     res.json({ status : status, qrcode : qrstr});
 });
 
+// Check client status
+app.get('/exit', (req, res) => {
+    process.exit()
+});
+
 client.initialize();
 // Start web server
 app.listen(port, () => {
+    status = ''
+    qrstr = '';
     console.log(`API running at http://localhost:${port}`);
 });
